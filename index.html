@@ -341,19 +341,25 @@
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const senhaCorreta = docSnap.data().senha;
+          const data = docSnap.data();
+          const senhaCorreta = data.senha || data.Senha;
 
-          if (senhaDigitada.trim() === senhaCorreta.toString()) {
+          if (!senhaCorreta) {
+            alert("Erro: O campo 'senha' não foi localizado dentro do documento 'config/painel'.");
+            return;
+          }
+
+          if (senhaDigitada.trim().toLowerCase() === senhaCorreta.toString().trim().toLowerCase()) {
             document.getElementById("modal-online").classList.remove("hidden");
           } else {
             alert("Senha incorreta!");
           }
         } else {
-          alert("Erro: Documento 'config/painel' com o campo 'senha' não foi localizado no Firestore.");
+          alert("Erro: Documento 'config/painel' não existe no Firestore.");
         }
       } catch (error) {
         console.error("Erro ao verificar senha no Firebase:", error);
-        alert("Falha de conexão ao validar a senha.");
+        alert("Falha de conexão ao validar a senha: " + error.message);
       }
     };
 
